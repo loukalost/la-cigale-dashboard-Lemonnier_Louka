@@ -1,0 +1,607 @@
+{
+  "name": "workflow-n8n-la-cigale-Lemonnier_Louka",
+  "nodes": [
+    {
+      "parameters": {
+        "modelName": "models/gemini-embedding-001"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -560,
+        704
+      ],
+      "id": "0fdaf535-c3b3-4af1-8012-3eeb17d3e7a6",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "y3McBEejbtez5VBn",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -2144,
+        272
+      ],
+      "id": "59baa98e-94a9-48c1-b9c2-2e5f4a3751eb",
+      "name": "Telegram Trigger",
+      "webhookId": "3452afe4-5bf5-4b14-bdcd-6cbcca31054d",
+      "credentials": {
+        "telegramApi": {
+          "id": "vrRah0L0hxt4Xogc",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "id": "927a5162-d900-47be-a35c-d5055d673066"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "text"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "203bb60b-50da-4253-a0b0-18895529349f",
+                    "leftValue": "={{ $json.message.voice }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "voice"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -1920,
+        272
+      ],
+      "id": "4154021c-69d7-49b6-9011-4d911eb49619",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.voice.file_id }}",
+        "additionalFields": {
+          "mimeType": "={{ $json.message.voice.mime_type }}"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -1696,
+        344
+      ],
+      "id": "0ca971a8-fc83-4939-a066-f59ca36bf72a",
+      "name": "Get a file",
+      "webhookId": "d5284c1b-7f5b-4670-9e07-9f9319c70a6b",
+      "credentials": {
+        "telegramApi": {
+          "id": "fFsVArbeWeOjwlt5",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        -1472,
+        344
+      ],
+      "id": "17651247-ad46-429c-a788-d650406cadb1",
+      "name": "Transcribe a recording",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "y3McBEejbtez5VBn",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "979bf886-3b2d-4636-b11d-cfd3318a2529",
+              "name": "message.text",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1248,
+        344
+      ],
+      "id": "6ebe353b-5c88-4509-81f9-37504fb6cc69",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -1024,
+        496
+      ],
+      "id": "5ce1ac5b-a49b-4e68-b56a-53b6ef7904ca",
+      "name": "gemini_model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "y3McBEejbtez5VBn",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $(\"Telegram Trigger\").item.json.message.chat.id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        -896,
+        496
+      ],
+      "id": "0f4d9896-0022-4f23-b0a0-00a47f876c4c",
+      "name": "postgres_memoire_chat",
+      "credentials": {
+        "postgres": {
+          "id": "EfQNQgq85ho9e7gA",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Create a record in Airtable",
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "app8Nyr0EO1974ZDS",
+          "mode": "list",
+          "cachedResultName": "n8n-la-cigale",
+          "cachedResultUrl": "https://airtable.com/app8Nyr0EO1974ZDS"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblCLPuKj9shslTpa",
+          "mode": "list",
+          "cachedResultName": "Réservations",
+          "cachedResultUrl": "https://airtable.com/app8Nyr0EO1974ZDS/tblCLPuKj9shslTpa"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "autre_info": "={{ $fromAI('autre_info', ``, 'string') }}",
+            "nombre_personne": "={{ $fromAI('nombre_personne', ``, 'number') }}",
+            "heure_reservation": "={{ $fromAI('heure_reservation', `L heure de réservation au format français avec h : par exemple 20h, 12h30, 19h45`, 'string') }}",
+            "statut": "={{ $fromAI('statut', ``, 'string') }}",
+            "nom_complet": "={{ $fromAI('nom_complet', ``, 'string') }}",
+            "Prénom": "={{ $('Switch').item.json.message.chat.first_name }}",
+            "date_reservation": "={{ $fromAI('date_reservation', `La date de réservation au format court uniquement : YYYY-MM-DD, par exemple \"2026-05-11\". Ne jamais inclure l heure ni le fuseau horaire.`, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Prénom",
+              "displayName": "Prénom",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "date_reservation",
+              "displayName": "date_reservation",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "heure_reservation",
+              "displayName": "heure_reservation",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "nombre_personne",
+              "displayName": "nombre_personne",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "autre_info",
+              "displayName": "autre_info",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "nom_complet",
+              "displayName": "nom_complet",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "statut",
+              "displayName": "statut",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        -768,
+        496
+      ],
+      "id": "e6f567b0-db28-428a-869d-df34d722e5f4",
+      "name": "Create a record in Airtable",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "TfuZ7jVDt7lYgyCj",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Tu es un serveur du restaurant La Cigale. Va chercher toutes tes connaissances dans Supabase Vector pour toutes les informations liées au menu ou à la carte, et toutes les questions posées dans le chat. Ne jamais inventer de réponse. Dis que tu n'as pas la réponse si tu ne sais pas.",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        -640,
+        496
+      ],
+      "id": "f8a2f51d-8377-4a52-a76b-e135c21eff8e",
+      "name": "Supabase Vector Store",
+      "credentials": {
+        "supabaseApi": {
+          "id": "oJ2NOtf8nVUPzONS",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {
+          "systemMessage": "## Réservations\n\nIMPORTANT : Tu DOIS utiliser l'outil \"Create a record in Airtable\" dès qu'un client souhaite réserver une table, sans exception.\n\nCollecte ces informations une par une si elles manquent :\n- Prénom\n- Nom complet\n- Date de réservation (format YYYY-MM-DD)\n- Heure de réservation (format \"20h\", \"12h30\")\n- Nombre de personnes\n- Informations complémentaires (allergies, occasion, peut être vide)\n\nUne fois toutes les informations collectées, appelle IMMÉDIATEMENT l'outil Airtable sans demander de confirmation supplémentaire. Mets toujours le statut à \"confirmé\".\n\nAprès la création, confirme au client avec un récapitulatif."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -904,
+        272
+      ],
+      "id": "6928966f-00a0-4702-9138-51748ed81797",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -272,
+        368
+      ],
+      "id": "4efcb083-7f1e-469a-bb60-6d5952660e21",
+      "name": "Send a text message",
+      "webhookId": "1ff04eb5-bbfe-418e-92e0-c9884200794e",
+      "credentials": {
+        "telegramApi": {
+          "id": "vrRah0L0hxt4Xogc",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1460982833089740976",
+          "mode": "list",
+          "cachedResultName": "Horial - Formateur",
+          "cachedResultUrl": "https://discord.com/channels/1460982833089740976"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1460982833542594596",
+          "mode": "list",
+          "cachedResultName": "log-nclc",
+          "cachedResultUrl": "https://discord.com/channels/1460982833089740976/1460982833542594596"
+        },
+        "content": "Louka Lemonnier :\n{{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        -272,
+        176
+      ],
+      "id": "7115b16f-48f9-48b2-ad5f-6a44e16181c9",
+      "name": "Send a message",
+      "webhookId": "3f65104c-294d-48a6-ab99-e0250e18a619",
+      "credentials": {
+        "discordBotApi": {
+          "id": "ByjHUBOXAFKPo8rG",
+          "name": "Discord Bot account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a file": {
+      "main": [
+        [
+          {
+            "node": "Transcribe a recording",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe a recording": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gemini_model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "postgres_memoire_chat": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a record in Airtable": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "906f3ca4-22be-4b2e-ae9d-ce1fff1c548a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "81b8d10bebee2d2c75039ac2ee0ce96c1b3f2923b0a5fd3d2acab259e7606662"
+  },
+  "id": "9BtmXfi7f54ODdkX",
+  "tags": []
+}
